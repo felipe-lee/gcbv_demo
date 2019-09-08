@@ -2,14 +2,11 @@
 """
 Common Views
 """
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.views.generic import TemplateView
 
 
-def home(request: HttpRequest) -> HttpResponse:
+class HomeView(TemplateView):
     """
     Render home page
-    :param request: user request
-    :return: response with home page
     """
-    return render(request=request, template_name='common/home.html')
+    template_name = 'common/home.html'
