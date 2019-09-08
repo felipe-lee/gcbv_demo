@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title>Todo List</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+          integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+          integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+          integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+          crossorigin="anonymous"></script>
+</head>
+
+<body class="{% block body_classes %}container-fluid d-flex flex-column flex-grow h-100 px-0{% endblock body_classes %}">
+
+<div id="skip-link">
+  <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+</div>
+
+<a id="top"></a>
+
+<header class="container-fluid p-0">
+  {% block header %}
+    <div class="row m-0">
+      <div class="col page-content">
+        <h1 id="head" class="mb-3">{% block page_header %}Todo List{% endblock page_header %}</h1>
+      </div>
+    </div>
+  {% endblock header %}
+</header>
+
+<main id="content" class="{% block main_classes %}container-fluid flex-grow p-2{% endblock main_classes %}" role="main">
+  {% include 'common/messages_with_dismissability.html' %}
+
+  {% block content %}
+  {% endblock content %}
+</main>
+
+<footer class="container-fluid bg-light pt-5 border-top">
+  {% block footer %}
+  {% endblock footer %}
+</footer>
+
+</body>
+</html>
