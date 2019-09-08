@@ -2,9 +2,12 @@ version: '3.7'
 
 services:
   db:
-    image: postgres
+    image: postgres:latest
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
   django:
     build: .
+    image: gcbv_demo_django:v1.0
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - type: bind
@@ -14,3 +17,5 @@ services:
       - "8000:8000"
     depends_on:
       - db
+volumes:
+  pgdata:
