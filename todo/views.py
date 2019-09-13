@@ -212,3 +212,18 @@ class DeleteTodoListView(DeleteView):
         messages.success(request=request, message=success_message)
 
         return redirect(success_url)
+
+
+def delete_todo_list_view(request, pk):
+    todo_list = TodoListModel.objects.get(id=pk)
+
+    if request.method == 'GET':
+        return render(request, 'todo/delete_todo_list.html', {'todo_list': todo_list})
+    elif request.method == 'POST':
+        success_message = _(f'Successfully deleted todo list: {todo_list}')
+
+        todo_list.delete()
+
+        messages.success(request=request, message=success_message)
+
+        return redirect(reverse_lazy('todo:list_todo_lists'))
