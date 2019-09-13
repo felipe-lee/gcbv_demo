@@ -1,0 +1,17 @@
+{% comment %}
+This sets up non field errors using bootstrap's classes and sets an alert role
+
+Variables you need to set in order to use this:
+    "non_field_errors" should be the non_field_errors from the form, e.g. non_field_errors=form.non_field_errors
+
+{% endcomment %}
+
+{% if non_field_errors %}
+  <div class="non-field-errors">
+    {% for error in non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

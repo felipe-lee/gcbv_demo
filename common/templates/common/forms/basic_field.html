@@ -1,0 +1,29 @@
+{% comment %}
+This sets up a basic input field to use bootstrap's form controls
+
+Variables you need to set in order to use this:
+    "field" should be the field from the form, e.g. field=form.my_field
+
+Optional vars:
+    "show_label" boolean indicating if the label should be for screen readers only, or display for all. default is
+        screen readers only
+    "type" Type of input. The default is text so if you want something else, e.g. email, then you need to set this var.
+    "placeholder" Placeholder for input. The default is the field label.
+    "label_classes" class(es) for label
+    "input_classes" Class(es) for input
+{% endcomment %}
+
+<label for="{{ field.id_for_label }}"
+       class="{% if not show_label %}sr-only{% endif %} {{ label_classes }}">{{ field.label }}</label>
+
+<input type="{% if type %}{{ type }}{% else %}text{% endif %}" id="{{ field.id_for_label }}"
+       name="{{ field.html_name }}"
+       class="form-control {% if field.errors %}is-invalid{% endif %} {{ input_classes }}"
+       placeholder="{% if placeholder %}{{ placeholder }}{% else %}{{ field.label }}{% endif %}"
+       value="{{ field.value|default_if_none:"" }}" {% if field.field.required %}required{% endif %}
+       {% if disabled %}disabled=""{% endif %}
+       {% if readonly %}readonly=""{% endif %}>
+
+{% include 'common/forms/field_errors.html' %}
+
+{% include 'common/forms/field_help_text.html' %}

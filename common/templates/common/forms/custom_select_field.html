@@ -1,0 +1,30 @@
+{% comment %}
+This sets up a basic input field to use bootstrap's form controls
+
+Variables you need to set in order to use this:
+    "field" should be the field from the form, e.g. field=form.my_field
+
+Optional vars:
+    "multiple" boolean indicating if this is a multiple select field or not.
+    "label_classes" class(es) for label. Used in combination with select_classes, this would allow you to do inline
+        forms
+    "select_classes" class(es) for the select input
+{% endcomment %}
+
+<label for="{{ field.id_for_label }}" class="col-form-label {{ label_classes }}">{{ field.label }}</label>
+
+<select class="custom-select {% if field.errors %}is-invalid{% endif %} {{ select_classes }}"
+        id="{{ field.id_for_label }}"
+        name="{{ field.html_name }}" {% if field.field.required %}required{% endif %}
+    {% if multiple %} multiple{% endif %}>
+  {% for value, text in field.field.choices %}
+    <option value="{{ value }}"
+            {% if multiple and value in field.value or field.value|add:"0" == value|add:"0" %}selected{% endif %}>
+      {{ text }}
+    </option>
+  {% endfor %}
+</select>
+
+{% include 'common/forms/field_errors.html' %}
+
+{% include 'common/forms/field_help_text.html' %}
