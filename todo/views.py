@@ -6,9 +6,10 @@ from copy import deepcopy
 from typing import Dict, Any
 
 from django.http import HttpRequest, HttpResponse
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 
 from todo.forms import SearchListsForm
+from todo.models import TodoListModel
 
 
 class SearchListsView(FormView):
@@ -46,3 +47,11 @@ class SearchListsView(FormView):
             kwargs['data'] = deepcopy(self.request.GET)
 
         return kwargs
+
+
+class ListTodoListsView(ListView):
+    """
+    View to list TodoLists
+    """
+    model = TodoListModel
+    template_name = 'todo/list_todo_lists.html'

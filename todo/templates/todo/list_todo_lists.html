@@ -1,0 +1,31 @@
+{% extends 'common/base.html' %}
+
+{% block page_header %}
+  Todo Lists
+{% endblock page_header %}
+
+{% block content %}
+  {% if object_list %}
+    <table class="table table-hover mb-0">
+      <caption class="sr-only">List of Todo Lists</caption>
+      <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Created</th>
+        <th scope="col">Last Updated</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for todo_list in object_list %}
+        <tr>
+          <td>{{ todo_list.name }}</td>
+          <td>{{ todo_list.created }}</td>
+          <td>{{ todo_list.last_updated }}</td>
+        </tr>
+      {% endfor class_info %}
+      </tbody>
+    </table>
+  {% else %}
+    No todo lists were found.
+  {% endif %}  {# if object_list #}
+{% endblock content %}
