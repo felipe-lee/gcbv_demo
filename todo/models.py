@@ -3,6 +3,7 @@
 models for todo app
 """
 from django.db import models
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -13,6 +14,13 @@ class TodoListModel(models.Model):
     name = models.CharField(verbose_name=_('list name'), max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+
+    def get_absolute_url(self) -> str:
+        """
+        Retrieve url to view list
+        :return: list url
+        """
+        return reverse_lazy('todo:display_todo_list', kwargs={'pk': self.id})
 
     def __str__(self) -> str:
         return self.name
