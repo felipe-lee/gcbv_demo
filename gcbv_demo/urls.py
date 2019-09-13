@@ -9,6 +9,6 @@ from common.views import HomeView
 
 urlpatterns = [
     path('todo/', include('todo.urls', namespace='todo')),
-    path('admin/', admin.site.urls),
+    path('mage/', admin.site.urls),
     path('', HomeView.as_view(), name='home')
 ]
