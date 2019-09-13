@@ -165,6 +165,29 @@ class UpdateTodoListView(UpdateView):
     context_object_name = 'todo_list'
 
 
+def update_todo_list_view(request, pk):
+    todo_list = TodoListModel.objects.get(id=pk)
+
+    context = {
+        'todo_list': todo_list
+    }
+
+    if request.method == 'GET':
+        context['form'] = TodoListForm(instance=todo_list)
+
+        return render(request, 'todo/update_todo_list.html', context)
+    elif request.method == 'POST':
+        form = TodoListForm(data=deepcopy(request.POST), instance=todo_list)
+
+        if form.is_valid():
+            todo_list = form.save()
+
+            return redirect(todo_list.get_absolute_url())
+        else:
+            context['form'] = form
+            return render(request, 'todo/update_todo_list.html', {'form': form})
+
+
 class DeleteTodoListView(DeleteView):
     """
     View to delete a todo list
