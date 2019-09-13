@@ -1,0 +1,22 @@
+{% extends 'common/base.html' %}
+
+{% block page_header %}Create Todo List{% endblock page_header %}
+
+{% block content %}
+  <form id="id-create-todo-list-form" action="{% url 'todo:create_todo_list' %}" method="post">
+    {% csrf_token %}
+
+    {% include 'common/forms/non_field_errors.html' with non_field_errors=form.non_field_errors %}
+
+    <div class="form-group">
+      {% include 'common/forms/basic_field.html' with field=form.name %}
+    </div>
+
+    <div>
+      <button type="submit" form="id-create-todo-list-form" name="create_todo_list"
+              class="btn btn-primary mb-1 mr-sm-1">
+        Create Todo List
+      </button>
+    </div>
+  </form>
+{% endblock content %}

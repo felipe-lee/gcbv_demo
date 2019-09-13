@@ -9,9 +9,9 @@ from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, CreateView
 
-from todo.forms import SearchListsForm
+from todo.forms import SearchListsForm, CreateTodoListForm
 from todo.models import TodoListModel
 
 
@@ -78,3 +78,13 @@ class ListTodoListsView(ListView):
             self.queryset = self.model.objects.filter(name__icontains=self.kwargs['name_search'])
 
         return super().get_queryset()
+
+
+class CreateTodoListView(CreateView):
+    """
+    View to create new todo lists
+    """
+    template_name = 'todo/create_todo_list.html'
+    form_class = CreateTodoListForm
+    success_url = reverse_lazy(
+        'todo:list_todo_lists')  # Todo: change to point to newly created list once that view exists
