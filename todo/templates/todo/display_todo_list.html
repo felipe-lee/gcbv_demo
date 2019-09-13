@@ -12,6 +12,15 @@
       <dt>Last Updated:</dt>
       <dd>{{ todo_list.last_updated }}</dd>
     </dl>
+
+    <a href="{% url 'todo:update_todo_list' pk=todo_list.id %}" title="go to page to update todo list"
+       class="btn btn-primary mb-1 mr-sm-1">
+      Update Todo List
+    </a>
+    <a href="{% url 'todo:delete_todo_list' pk=todo_list.id %}" title="go to page to delete todo list"
+       class="btn btn-secondary mb-1 mr-sm-1">
+      Delete Todo List
+    </a>
   </section>
   <section id="id-list-items">
     <h2>List Items</h2>
