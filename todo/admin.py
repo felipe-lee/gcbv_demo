@@ -2,5 +2,8 @@
 """
 admin config for todo app
 """
+from django.contrib import admin
 
-# Register your models here.
+from todo.models import TodoListModel, TodoItemModel
+
+admin.site.register([TodoListModel, TodoItemModel])

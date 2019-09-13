@@ -14,6 +14,9 @@ class TodoListModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class TodoItemModel(models.Model):
     """
