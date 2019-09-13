@@ -124,6 +124,22 @@ class CreateTodoListView(CreateView):
     form_class = TodoListForm
 
 
+def create_todo_list_view(request):
+    if request.method == 'GET':
+        form = TodoListForm()
+
+        return render(request, 'todo/create_todo_list.html', {'form': form})
+    elif request.method == 'POST':
+        form = TodoListForm(data=deepcopy(request.POST))
+
+        if form.is_valid():
+            todo_list = form.save()
+
+            return redirect(todo_list.get_absolute_url())
+        else:
+            return render(request, 'todo/create_todo_list.html', {'form': form})
+
+
 class DisplayTodoListView(DetailView):
     """
     View to show detailed view of todo list
