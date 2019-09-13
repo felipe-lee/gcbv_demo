@@ -1,2 +1,4 @@
 django==2.2.*
 postgres==2.2.*
+argon2-cffi==19.1.*
+django-authtools==1.7.*
