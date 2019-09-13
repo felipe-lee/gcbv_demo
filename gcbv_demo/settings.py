@@ -41,6 +41,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'authtools',
 ]
 
 PROJECT_APPS = [
@@ -77,8 +78,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gcbv_demo.wsgi.application'
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -93,6 +94,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'authtools.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -112,6 +114,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
