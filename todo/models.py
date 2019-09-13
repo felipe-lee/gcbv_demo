@@ -10,7 +10,7 @@ class TodoListModel(models.Model):
     """
     Model to keep todo lists
     """
-    name = models.CharField(verbose_name=_('list name'), max_length=200)
+    name = models.CharField(verbose_name=_('list name'), max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
 
