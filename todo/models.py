@@ -32,6 +32,7 @@ class TodoItemModel(models.Model):
     """
     todo_list = models.ForeignKey(TodoListModel, default=None, on_delete=models.CASCADE)
     text = models.TextField()
+    completed = models.BooleanField()
 
     class Meta:
         ordering = ('id',)
