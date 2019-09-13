@@ -5,11 +5,13 @@ Views for todo app
 from copy import deepcopy
 from typing import Dict, Any, List, Union
 
+from django.contrib import messages
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView, ListView, CreateView, DetailView, UpdateView
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic import FormView, ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from todo.forms import SearchListsForm, TodoListForm
 from todo.models import TodoListModel
@@ -105,3 +107,29 @@ class UpdateTodoListView(UpdateView):
     form_class = TodoListForm
     model = TodoListModel
     context_object_name = 'todo_list'
+
+
+class DeleteTodoListView(DeleteView):
+    """
+    View to delete a todo list
+    """
+    template_name = 'todo/delete_todo_list.html'
+    model = TodoListModel
+    context_object_name = 'todo_list'
+    success_url = reverse_lazy('todo:list_todo_lists')
+
+    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL. Overriding to add a message.
+        :param request: wsgi request
+        """
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        success_message = _(f'Successfully deleted todo list: {self.object}')
+
+        self.object.delete()
+
+        messages.success(request=request, message=success_message)
+
+        return redirect(success_url)
