@@ -18,7 +18,11 @@
       <tbody>
       {% for todo_list in object_list %}
         <tr>
-          <td>{{ todo_list.name }}</td>
+          <td>
+            <a href="{% url 'todo:display_todo_list' pk=todo_list.id %}" title="todo list details">
+              {{ todo_list.name }}
+            </a>
+          </td>
           <td>{{ todo_list.created }}</td>
           <td>{{ todo_list.last_updated }}</td>
         </tr>
@@ -26,10 +30,12 @@
       </tbody>
     </table>
   {% else %}
-    {% if view.kwargs.name_search %}
-      No todo lists were found with input name: {{ view.kwargs.name_search }}.
-    {% else %}
-      No todo lists were found.
-    {% endif %}
+    <p>
+      {% if view.kwargs.name_search %}
+        No todo lists were found with input name: {{ view.kwargs.name_search }}.
+      {% else %}
+        No todo lists were found.
+      {% endif %}
+    </p>
   {% endif %}  {# if object_list #}
 {% endblock content %}
