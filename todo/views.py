@@ -7,6 +7,8 @@ from typing import Dict, Any, List, Union
 
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.views.generic import FormView, ListView
 
 from todo.forms import SearchListsForm
@@ -48,6 +50,16 @@ class SearchListsView(FormView):
             kwargs['data'] = deepcopy(self.request.GET)
 
         return kwargs
+
+    def form_valid(self, form) -> HttpResponse:
+        """
+        Redirect to view that lists todo lists, filtered by name search.
+        :param form: validated form
+        :return: redirect to another view
+        """
+        name = form.cleaned_data.get('name')
+
+        return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
 
 
 class ListTodoListsView(ListView):
