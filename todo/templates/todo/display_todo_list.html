@@ -1,0 +1,31 @@
+{% extends 'common/base.html' %}
+
+{% block page_header %}{{ todo_list.name }}{% endblock page_header %}
+
+{% block content %}
+  <section id="id-list-info">
+    <h2>List Info</h2>
+    <dl>
+      <dt>Created:</dt>
+      <dd>{{ todo_list.created }}</dd>
+
+      <dt>Last Updated:</dt>
+      <dd>{{ todo_list.last_updated }}</dd>
+    </dl>
+  </section>
+  <section id="id-list-items">
+    <h2>List Items</h2>
+
+    {% if todo_list.todoitemmodel_set.all %}
+      <ul>
+        {% for todo_item in todo_list.todoitemmodel_set.all %}
+          <li>{{ todo_item.text }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>
+        This list has no items.
+      </p>
+    {% endif %}
+  </section>
+{% endblock content %}
