@@ -149,6 +149,12 @@ class DisplayTodoListView(DetailView):
     context_object_name = 'todo_list'
 
 
+def display_todo_list_view(request, pk):
+    todo_list = TodoListModel.objects.get(id=pk)
+
+    render(request, 'todo/display_todo_list.html', {'todo_list': todo_list})
+
+
 class UpdateTodoListView(UpdateView):
     """
     View to update a todo list
