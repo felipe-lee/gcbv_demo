@@ -104,6 +104,18 @@ class ListTodoListsView(ListView):
         return super().get_queryset()
 
 
+def list_todo_lists_view(request, name_search=''):
+    queryset = TodoListModel.objects.all()
+    if name_search:
+        queryset = queryset.filter(name__icontains=name_search)
+
+    context = {
+        'object_list': queryset,
+        'name_search': name_search,
+    }
+    return render(request, 'todo/list_todo_lists.html', context)
+
+
 class CreateTodoListView(CreateView):
     """
     View to create new todo lists
