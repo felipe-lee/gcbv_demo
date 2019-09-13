@@ -15,9 +15,9 @@ class SearchListsForm(forms.Form):
     name = forms.CharField(label=_('list name'), required=True)
 
 
-class CreateTodoListForm(forms.ModelForm):
+class TodoListForm(forms.ModelForm):
     """
-    Form to create new todo lists
+    Form to create and edit todo lists
     """
 
     class Meta:
