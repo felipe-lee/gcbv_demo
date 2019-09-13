@@ -86,8 +86,6 @@ class CreateTodoListView(CreateView):
     """
     template_name = 'todo/create_todo_list.html'
     form_class = TodoListForm
-    success_url = reverse_lazy(
-        'todo:list_todo_lists')  # Todo: change to point to newly created list once that view exists
 
 
 class DisplayTodoListView(DetailView):
