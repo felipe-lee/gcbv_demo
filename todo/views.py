@@ -3,8 +3,9 @@
 Views for todo app
 """
 from copy import deepcopy
-from typing import Dict, Any
+from typing import Dict, Any, List, Union
 
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.views.generic import FormView, ListView
 
@@ -55,3 +56,13 @@ class ListTodoListsView(ListView):
     """
     model = TodoListModel
     template_name = 'todo/list_todo_lists.html'
+
+    def get_queryset(self) -> Union[QuerySet, List[TodoListModel]]:
+        """
+        Returns queryset with everything, or filtered
+        :return:
+        """
+        if 'name_search' in self.kwargs:
+            self.queryset = self.model.objects.filter(name__icontains=self.kwargs['name_search'])
+
+        return super().get_queryset()
