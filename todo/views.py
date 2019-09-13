@@ -7,8 +7,8 @@ from typing import Dict, Any, List, Union
 
 from django.contrib import messages
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, ListView, CreateView, DetailView, UpdateView, DeleteView
@@ -62,6 +62,28 @@ class SearchListsView(FormView):
         name = form.cleaned_data.get('name')
 
         return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
+
+
+def search_lists_view(request):
+    if not request.method == 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    form_kwargs = {}
+    if request.GET:
+        form_kwargs['data'] = deepcopy(request.GET)
+
+    form = SearchListsForm(**form_kwargs)
+
+    if request.GET and form.is_valid():
+        name = form.cleaned_data.get('name')
+
+        return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'todo/search_lists.html', context)
 
 
 class ListTodoListsView(ListView):
