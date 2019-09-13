@@ -12,7 +12,7 @@ class TodoListModel(models.Model):
     """
     name = models.CharField(verbose_name=_('list name'), max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True)
-    last_edited = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.name
