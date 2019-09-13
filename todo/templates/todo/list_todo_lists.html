@@ -26,6 +26,10 @@
       </tbody>
     </table>
   {% else %}
-    No todo lists were found.
+    {% if view.kwargs.name_search %}
+      No todo lists were found with input name: {{ view.kwargs.name_search }}.
+    {% else %}
+      No todo lists were found.
+    {% endif %}
   {% endif %}  {# if object_list #}
 {% endblock content %}
