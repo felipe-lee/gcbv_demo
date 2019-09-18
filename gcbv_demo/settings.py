@@ -26,6 +26,9 @@ SECRET_KEY = 'xqq8#!2f1*ku9k2a1m6z($&a25@rs=j+$%s2d8wv0%0m2c$vps'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Use this to trigger using the different view types
+VIEW_TYPES = os.environ.get('DJANGO_VIEW_TYPES', 'CBV')
+
 ALLOWED_HOSTS = []
 
 
