@@ -17,6 +17,15 @@ from todo.forms import SearchListsForm, TodoListForm
 from todo.models import TodoListModel
 
 
+def home_view(request: HttpRequest) -> HttpResponse:
+    """
+    Render todo home page
+    :param request: user wsgi request
+    :return: home page
+    """
+    return render(request=request, template_name='todo/home.html')
+
+
 class SearchListsView(FormView):
     """
     View to search through existing lists
