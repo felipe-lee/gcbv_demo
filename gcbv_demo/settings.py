@@ -45,6 +45,8 @@ THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
+    'common.apps.CommonConfig',
+    'todo.apps.TodoConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
