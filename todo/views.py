@@ -73,7 +73,12 @@ class SearchListsView(FormView):
         return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
 
 
-def search_lists_view(request):
+def search_lists_view(request: HttpRequest) -> Union[HttpResponse, HttpResponseRedirect]:
+    """
+    View to search through existing lists
+    :param request: wsgi request
+    :return: template with form to search through lists, or redirect to view that will filter lists
+    """
     if not request.method == 'GET':
         return HttpResponseNotAllowed(['GET'])
 
@@ -104,8 +109,8 @@ class ListTodoListsView(ListView):
 
     def get_queryset(self) -> Union[QuerySet, List[TodoListModel]]:
         """
-        Returns queryset with everything, or filtered
-        :return:
+        Filter queryset, if we need to.
+        :return: Returns queryset, either full or filtered
         """
         if 'name_search' in self.kwargs:
             self.queryset = self.model.objects.filter(name__icontains=self.kwargs['name_search'])
@@ -113,7 +118,13 @@ class ListTodoListsView(ListView):
         return super().get_queryset()
 
 
-def list_todo_lists_view(request, name_search=''):
+def list_todo_lists_view(request: HttpRequest, name_search='') -> HttpResponse:
+    """
+    View to list TodoLists
+    :param request: wsgi request
+    :param name_search: string to filter queryset by
+    :return: template with todo lists
+    """
     queryset = TodoListModel.objects.all()
     if name_search:
         queryset = queryset.filter(name__icontains=name_search)
@@ -142,7 +153,12 @@ class CreateTodoListView(CreateView):
     form_class = TodoListForm
 
 
-def create_todo_list_view(request):
+def create_todo_list_view(request: HttpRequest) -> Union[HttpResponse, HttpResponseRedirect]:
+    """
+    View to create new todo lists
+    :param request: wsgi request
+    :return: template with form to create new list, or redirect to detail page of list
+    """
     if request.method == 'GET':
         form = TodoListForm()
 
@@ -167,10 +183,16 @@ class DisplayTodoListView(DetailView):
     context_object_name = 'todo_list'
 
 
-def display_todo_list_view(request, pk):
+def display_todo_list_view(request: HttpRequest, pk: int) -> HttpResponse:
+    """
+    view to show detailed view of todo list
+    :param request: wsgi request
+    :param pk: pk of todo list
+    :return: template with list details
+    """
     todo_list = TodoListModel.objects.get(id=pk)
 
-    render(request, 'todo/display_todo_list.html', {'todo_list': todo_list})
+    return render(request, 'todo/display_todo_list.html', {'todo_list': todo_list})
 
 
 class UpdateTodoListView(UpdateView):
@@ -183,7 +205,13 @@ class UpdateTodoListView(UpdateView):
     context_object_name = 'todo_list'
 
 
-def update_todo_list_view(request, pk):
+def update_todo_list_view(request: HttpRequest, pk: int) -> Union[HttpResponse, HttpResponseRedirect]:
+    """
+    View to update a todo list
+    :param request: wsgi request
+    :param pk: pk of todo list
+    :return: template with form to edit todo list, or redirect to details page
+    """
     todo_list = TodoListModel.objects.get(id=pk)
 
     context = {
@@ -232,7 +260,13 @@ class DeleteTodoListView(DeleteView):
         return redirect(success_url)
 
 
-def delete_todo_list_view(request, pk):
+def delete_todo_list_view(request: HttpRequest, pk: int) -> HttpResponseRedirect:
+    """
+    delete a todo list
+    :param request: wsgi request
+    :param pk: pk of todo list
+    :return: redirect to full listing page
+    """
     todo_list = TodoListModel.objects.get(id=pk)
 
     if request.method == 'GET':
