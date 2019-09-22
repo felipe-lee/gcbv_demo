@@ -3,15 +3,15 @@
 Views for todo app
 """
 from copy import deepcopy
-from typing import Dict, Any, List, Union
+from typing import Any, Dict, List, Union
 
 from django.contrib import messages
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, ListView, CreateView, DetailView, UpdateView, DeleteView
+from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView
 
 from todo.forms import SearchListsForm, TodoListForm
 from todo.models import TodoListModel
@@ -123,6 +123,15 @@ def list_todo_lists_view(request, name_search=''):
         'name_search': name_search,
     }
     return render(request, 'todo/list_todo_lists.html', context)
+
+
+def redirect_to_list_todo_lists_view(request: HttpRequest) -> HttpResponseRedirect:
+    """
+    Redirects to the new url we want users to use.
+    :param request: wsgi request
+    :return: redirect to new url
+    """
+    return redirect(to='todo:list_todo_lists')
 
 
 class CreateTodoListView(CreateView):
