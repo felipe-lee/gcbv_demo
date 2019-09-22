@@ -40,9 +40,9 @@ class SearchListsView(FormView):
         :param request: wsgi request
         :return: response for user
         """
-        form = self.get_form()
-
         if request.GET:
+            form = self.get_form()
+
             if form.is_valid():
                 return self.form_valid(form)
             else:
