@@ -16,8 +16,8 @@ if settings.VIEW_TYPES == 'CBV':
     print('using class-based views')
 
     urlpatterns = [
-        path('list-todo-lists/', ListTodoListsView.as_view(), name='list_todo_lists'),
         path('show-all-lists/', RedirectView.as_view(pattern_name='todo:list_todo_lists'), name='show_all_lists'),
+        path('list-todo-lists/', ListTodoListsView.as_view(), name='list_todo_lists'),
         path('list-todo-lists/<name_search>/', ListTodoListsView.as_view(), name='list_filtered_todo_lists'),
         path('create-todo-list/', CreateTodoListView.as_view(), name='create_todo_list'),
         path('display-todo-list/<int:pk>/', DisplayTodoListView.as_view(), name='display_todo_list'),
@@ -30,8 +30,8 @@ else:
     print('using function-based views')
 
     urlpatterns = [
-        path('list-todo-lists/', list_todo_lists_view, name='list_todo_lists'),
         path('show-all-lists/', redirect_to_list_todo_lists_view, name='show_all_lists'),
+        path('list-todo-lists/', list_todo_lists_view, name='list_todo_lists'),
         path('list-todo-lists/<name_search>/', list_todo_lists_view, name='list_filtered_todo_lists'),
         path('create-todo-list/', create_todo_list_view, name='create_todo_list'),
         path('display-todo-list/<int:pk>/', display_todo_list_view, name='display_todo_list'),
