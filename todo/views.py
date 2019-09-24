@@ -112,10 +112,12 @@ class ListTodoListsView(ListView):
         Filter queryset, if we need to.
         :return: Returns queryset, either full or filtered
         """
-        if 'name_search' in self.kwargs:
-            self.queryset = self.model.objects.filter(name__icontains=self.kwargs['name_search'])
+        queryset = super().get_queryset()
 
-        return super().get_queryset()
+        if 'name_search' in self.kwargs:
+            queryset = queryset.filter(name__icontains=self.kwargs['name_search'])
+
+        return queryset
 
 
 def list_todo_lists_view(request: HttpRequest, name_search='') -> HttpResponse:
