@@ -73,6 +73,10 @@ class GetFormView(TemplateResponseMixin, ProcessGetFormMixin, View):
     """
 
 
+# Code below this is in py2, django 1.11. I didn't feel like converting it since it's not good code, and it's
+# "understandable" in its current state.
+
+
 class MultiFormCreateView(CreateView):
     """
     This allows you to handle multiple forms on one page. It can handle forms that each have their own submit button
