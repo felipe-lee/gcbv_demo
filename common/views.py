@@ -2,11 +2,17 @@
 """
 Common Views
 """
+from copy import deepcopy
+from typing import Any, Dict
+
 from django.db.models import ForeignKey
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.views import View
 from django.views.generic import CreateView, TemplateView
+from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.edit import FormMixin
 from six import iteritems
 
 
@@ -24,6 +30,47 @@ def home_view(request: HttpRequest) -> HttpResponse:
     :return: home page
     """
     return render(request=request, template_name='common/home.html')
+
+
+class ProcessGetFormMixin(FormMixin):
+    """
+    Mixin to handle form GET submissions. Based on loosely on ProcessFormView.
+    """
+    http_method_names = ['get', 'head', 'options']
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Set up form and if data was passed in, validate it, otherwise render page with form.
+        :param request: wsgi request
+        :return: response for user
+        """
+        form = self.get_form()
+
+        if request.GET:
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_form_kwargs(self) -> Dict[str, Any]:
+        """
+        Get kwargs to instantiate form
+        :return: form kwargs
+        """
+        kwargs = super().get_form_kwargs()
+
+        if self.request.GET:
+            kwargs['data'] = deepcopy(self.request.GET)
+
+        return kwargs
+
+
+class GetFormView(TemplateResponseMixin, ProcessGetFormMixin, View):
+    """
+    View to prepare a form, and either render it or process its submission data.
+    """
 
 
 class MultiFormCreateView(CreateView):
