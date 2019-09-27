@@ -3,7 +3,7 @@
 Views for todo app
 """
 from copy import deepcopy
-from typing import Any, Dict, List, Union
+from typing import List, Union
 
 from django.contrib import messages
 from django.db.models import QuerySet
@@ -11,8 +11,9 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpR
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from common.views import GetFormView
 from todo.forms import SearchListsForm, TodoListForm
 from todo.models import TodoListModel
 
@@ -26,41 +27,13 @@ def home_view(request: HttpRequest) -> HttpResponse:
     return render(request=request, template_name='todo/home.html')
 
 
-class SearchListsView(FormView):
+class SearchListsView(GetFormView):
     """
     View to search through existing lists
     """
     form_class = SearchListsForm
     template_name = 'todo/search_lists.html'
     http_method_names = ['get', 'options']
-
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        """
-        Set up form and if data was passed in, validate it, otherwise render page with form.
-        :param request: wsgi request
-        :return: response for user
-        """
-        if request.GET:
-            form = self.get_form()
-
-            if form.is_valid():
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
-
-        return super().get(request, *args, **kwargs)
-
-    def get_form_kwargs(self) -> Dict[str, Any]:
-        """
-        Get kwargs to instantiate form
-        :return: form kwargs
-        """
-        kwargs = super().get_form_kwargs()
-
-        if self.request.GET:
-            kwargs['data'] = deepcopy(self.request.GET)
-
-        return kwargs
 
     def form_valid(self, form) -> HttpResponse:
         """
