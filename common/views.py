@@ -3,14 +3,16 @@
 Common Views
 """
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any, Dict, TypeVar
 
-from django.db.models import ForeignKey
-from django.http import HttpRequest
+from django.db.models import ForeignKey, QuerySet
+from django.forms import Form
+from django.http import Http404, HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils.translation import ugettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, ListView, TemplateView
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import FormMixin
 from six import iteritems
@@ -71,6 +73,83 @@ class GetFormView(TemplateResponseMixin, ProcessGetFormMixin, View):
     """
     View to prepare a form, and either render it or process its submission data.
     """
+
+
+TForm = TypeVar('TForm', bound=Form)
+
+
+class FormListView(ProcessGetFormMixin, ListView):
+    """
+    View to render/process a form and list out model data.
+    """
+    # boolean indicating if queryset should be retrieved first-time through, i.e. form hasn't been submitted
+    retrieve_queryset_first_time: bool = True
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        """
+        Add form to class variables that are easily accessible
+        :param request: wsgi request
+        """
+        super().setup(request, *args, **kwargs)
+
+        self.form: TForm
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Set up initial object list, which can be filtered later if need be.
+        :param request: wsgi request
+        :return: template with form, and possibly a queryset
+        """
+        if self.retrieve_queryset_first_time:
+            self.object_list = self.get_queryset()
+
+            self.check_for_empty_queryset()
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form: TForm) -> HttpResponse:
+        """
+        Retrieves/filters the object list upon successful form submission.
+        :param form: validated form
+        :return: template with form and list of data
+        """
+        if not self.retrieve_queryset_first_time:
+            self.object_list = self.get_queryset()
+
+        self.form = form
+        self.object_list = self.filter_queryset()
+
+        # Already checked this in get, but if we have filtered, need to check if the queryset is empty now.
+        self.check_for_empty_queryset()
+
+        context = self.get_context_data(form=form)
+
+        return self.render_to_response(context)
+
+    def filter_queryset(self) -> QuerySet:
+        """
+        Filters queryset based on form data. Really just a hook for children to modify and enable filtering.
+        :return: filtered queryset
+        """
+        return self.object_list
+
+    def check_for_empty_queryset(self) -> None:
+        """
+        Checks for an empty queryset and raises an error if appropriate (based on set attrs). Basically just re-doing
+        what BaseListView does on GET.
+        """
+        allow_empty = self.get_allow_empty()
+
+        if not allow_empty:
+            # When pagination is enabled and object_list is a queryset, it's better to do a cheap query than to load the
+            # unpaginated queryset in memory.
+            if self.get_paginate_by(self.object_list) is not None and hasattr(self.object_list, 'exists'):
+                is_empty = not self.object_list.exists()
+            else:
+                is_empty = not self.object_list
+
+            if is_empty:
+                raise Http404(_(f'Empty list and "{self.__class__.__name__}.allow_empty" is False.'))
 
 
 # Code below this is in py2, django 1.11. I didn't feel like converting it since it's not good code, and it's
