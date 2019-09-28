@@ -3,13 +3,14 @@
 Common Views
 """
 from copy import deepcopy
-from typing import Any, Dict, TypeVar
+from typing import Any, Callable, Dict, TypeVar
 
 from django.db.models import ForeignKey, QuerySet
 from django.forms import Form
 from django.http import Http404, HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils.decorators import classonlymethod
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, ListView, TemplateView
@@ -17,12 +18,25 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import FormMixin
 from six import iteritems
 
+from common.helpers import my_awesome_decorator
+
 
 class HomeView(TemplateView):
     """
     Render home page
     """
     template_name = 'common/home.html'
+
+    @classonlymethod
+    def as_view(cls, **initkwargs) -> Callable[[HttpRequest, Any, Any], HttpResponse]:
+        """
+        Wrap function that as_view produces with decorator.
+        :param initkwargs: kwargs to pass to view __init__
+        :return: function to represent view, wrapped by decorator
+        """
+        view = super().as_view(**initkwargs)
+
+        return my_awesome_decorator(view)
 
 
 def home_view(request: HttpRequest) -> HttpResponse:
