@@ -1,0 +1,10 @@
+{% extends 'common/base.html' %}
+
+{% block page_header %}
+  Todo Lists
+{% endblock page_header %}
+
+{% block content %}
+  {% include 'todo/list_search_form.html' %}
+  {% include 'todo/list_table.html' %}
+{% endblock content %}

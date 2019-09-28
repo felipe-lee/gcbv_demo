@@ -13,7 +13,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from common.views import GetFormView
+from common.views import FormListView, GetFormView
 from todo.forms import SearchListsForm, TodoListForm
 from todo.models import TodoListModel
 
@@ -118,6 +118,26 @@ def redirect_to_list_todo_lists_view(request: HttpRequest) -> HttpResponseRedire
     :return: redirect to new url
     """
     return redirect(to='todo:list_todo_lists')
+
+
+class ListAndFilterTodoListsView(FormListView):
+    """
+    List and possibly filter todo lists
+    """
+    form_class = SearchListsForm
+    model = TodoListModel
+    template_name = 'todo/list_and_filter_todo_lists.html'
+
+    def filter_queryset(self) -> QuerySet:
+        """
+        Filter queryset based on input name
+        :return: filtered queryset
+        """
+        queryset = super().filter_queryset()
+
+        list_name = self.form.cleaned_data.get('name')
+
+        return queryset.filter(name__icontains=list_name)
 
 
 class CreateTodoListView(CreateView):
