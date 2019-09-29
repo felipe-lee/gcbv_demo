@@ -12,10 +12,12 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from rest_framework import viewsets
 
 from common.views import FormListView, GetFormView
 from todo.forms import SearchListsForm, TodoListForm
-from todo.models import TodoListModel
+from todo.models import TodoItemModel, TodoListModel
+from todo.serializers import TodoItemSerializer
 
 
 def home_view(request: HttpRequest) -> HttpResponse:
@@ -274,3 +276,11 @@ def delete_todo_list_view(request: HttpRequest, pk: int) -> HttpResponseRedirect
         messages.success(request=request, message=success_message)
 
         return redirect(reverse_lazy('todo:list_and_filter_todo_lists'))
+
+
+class TodoItemViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows todo items to be viewed or edited
+    """
+    queryset = TodoItemModel.objects.all()
+    serializer_class = TodoItemSerializer

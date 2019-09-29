@@ -3,13 +3,14 @@
 Url config for todo app
 """
 from django.conf import settings
-from django.urls import path
+from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
+from rest_framework import routers
 
 from todo.views import CreateTodoListView, DeleteTodoListView, DisplayTodoListView, ListAndFilterTodoListsView, \
-    ListTodoListsView, SearchListsView, UpdateTodoListView, create_todo_list_view, delete_todo_list_view, \
-    display_todo_list_view, home_view, list_todo_lists_view, redirect_to_list_todo_lists_view, search_lists_view, \
-    update_todo_list_view
+    ListTodoListsView, SearchListsView, TodoItemViewSet, UpdateTodoListView, create_todo_list_view, \
+    delete_todo_list_view, display_todo_list_view, home_view, list_todo_lists_view, redirect_to_list_todo_lists_view, \
+    search_lists_view, update_todo_list_view
 
 app_name = 'todo'
 
@@ -43,3 +44,11 @@ else:
         path('search-lists/', search_lists_view, name='search_lists'),
         path('', home_view, name='home'),
     ]
+
+# The rest of the urls will just be to round out the functionality so I'm not going to create them as both CBVs and FBVs
+router = routers.DefaultRouter()
+router.register(r'items', TodoItemViewSet)
+
+urlpatterns.extend([
+    path('api/', include((router.urls, 'items'), namespace='items')),
+])
