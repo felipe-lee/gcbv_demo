@@ -1,5 +1,7 @@
 {% extends 'common/base.html' %}
 
+{% load static %}
+
 {% block page_header %}{{ todo_list.name }}{% endblock page_header %}
 
 {% block content %}
@@ -26,7 +28,7 @@
     <h2>List Items</h2>
 
     {% if todo_list.todoitemmodel_set.all %}
-      <ul>
+      <ul id="id-todo-items">
         {% for todo_item in todo_list.todoitemmodel_set.all %}
           <li>{{ todo_item.text }}</li>
         {% endfor %}
@@ -36,5 +38,35 @@
         This list has no items.
       </p>
     {% endif %}
+
+    <form id="id-add-item-form" action="{% url 'todo:items:todoitemmodel-list' %}" method="post" class="form-inline">
+      {% csrf_token %}
+
+      {% include 'common/forms/non_field_errors.html' with non_field_errors=form.non_field_errors %}
+
+      <div class="form-group">
+        {% include 'common/forms/basic_field.html' with field=form.todo_list readonly=True hidden=True %}
+      </div>
+
+      <div class="form-group">
+        {% include 'common/forms/basic_field.html' with field=form.text %}
+      </div>
+
+      <div class="form-group pl-3 pr-2">
+        <div class="custom-control custom-checkbox custom-control-inline">
+          <input id="id-{{ form.completed.html_name }}" type="checkbox"
+                 class="custom-control-input {% if form.completed.errors %}is-invalid{% endif %}"
+                 name="{{ form.completed.html_name }}">
+          <label for="id-{{ form.completed.html_name }}"
+                 class="custom-control-label">{{ form.completed.label }}?</label>
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" form="id-add-item-form" name="add_item" class="btn btn-primary mb-1 mr-sm-1">
+          Add New Item
+        </button>
+      </div>
+    </form>
   </section>
 {% endblock content %}

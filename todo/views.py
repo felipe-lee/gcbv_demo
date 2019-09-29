@@ -3,7 +3,7 @@
 Views for todo app
 """
 from copy import deepcopy
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from django.contrib import messages
 from django.db.models import QuerySet
@@ -15,7 +15,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from rest_framework import viewsets
 
 from common.views import FormListView, GetFormView
-from todo.forms import SearchListsForm, TodoListForm
+from todo.forms import SearchListsForm, TodoItemForm, TodoListForm
 from todo.models import TodoItemModel, TodoListModel
 from todo.serializers import TodoItemSerializer
 
@@ -178,6 +178,20 @@ class DisplayTodoListView(DetailView):
     template_name = 'todo/display_todo_list.html'
     model = TodoListModel
     context_object_name = 'todo_list'
+
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        """
+        Add new item form to context
+        :param kwargs: kwargs for template context
+        :return: kwargs for template context with form added
+        """
+        initial = {
+            'todo_list': self.kwargs.get('pk')
+        }
+
+        kwargs['form'] = TodoItemForm(initial=initial)
+
+        return super().get_context_data(**kwargs)
 
 
 def display_todo_list_view(request: HttpRequest, pk: int) -> HttpResponse:
