@@ -51,19 +51,9 @@
                 </a>
               </li>
               <li class="nav-item reg-nav-item px-3 px-lg-1 py-0">
-                {% url 'todo:search_lists' as todo_search_lists_url %}
-                <a class="nav-link text-uppercase text-dark {% if request.path_info == todo_search_lists_url %}active{% endif %}"
-                   href="{% url 'todo:search_lists' %}" title="Search page for todo lists">
-                  Todo Lists Search Page
-                  {% if request.path_info == todo_search_lists_url %}
-                    <span class="sr-only">(current)</span>
-                  {% endif %}
-                </a>
-              </li>
-              <li class="nav-item reg-nav-item px-3 px-lg-1 py-0">
-                {% url 'todo:list_todo_lists' as todo_lists_listing_url %}
+                {% url 'todo:list_and_filter_todo_lists' as todo_lists_listing_url %}
                 <a class="nav-link text-uppercase text-dark {% if request.path_info == todo_lists_listing_url %}active{% endif %}"
-                   href="{% url 'todo:list_todo_lists' %}">
+                   href="{{ todo_lists_listing_url }}">
                   Todo Lists Listing Page
                   {% if request.path_info == todo_lists_listing_url %}
                     <span class="sr-only">(current)</span>

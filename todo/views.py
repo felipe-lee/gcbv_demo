@@ -236,7 +236,7 @@ class DeleteTodoListView(DeleteView):
     template_name = 'todo/delete_todo_list.html'
     model = TodoListModel
     context_object_name = 'todo_list'
-    success_url = reverse_lazy('todo:list_todo_lists')
+    success_url = reverse_lazy('todo:list_and_filter_todo_lists')
 
     def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """
@@ -273,4 +273,4 @@ def delete_todo_list_view(request: HttpRequest, pk: int) -> HttpResponseRedirect
 
         messages.success(request=request, message=success_message)
 
-        return redirect(reverse_lazy('todo:list_todo_lists'))
+        return redirect(reverse_lazy('todo:list_and_filter_todo_lists'))

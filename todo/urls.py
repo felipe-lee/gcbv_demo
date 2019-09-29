@@ -17,7 +17,8 @@ if settings.VIEW_TYPES == 'CBV':
     print('using class-based views')
 
     urlpatterns = [
-        path('show-all-lists/', RedirectView.as_view(pattern_name='todo:list_todo_lists'), name='show_all_lists'),
+        path('show-all-lists/', RedirectView.as_view(pattern_name='todo:list_and_filter_todo_lists'),
+             name='show_all_lists'),
         path('list-todo-lists/', ListTodoListsView.as_view(), name='list_todo_lists'),
         path('list-todo-lists/<name_search>/', ListTodoListsView.as_view(), name='list_filtered_todo_lists'),
         path('lists/', ListAndFilterTodoListsView.as_view(), name='list_and_filter_todo_lists'),
