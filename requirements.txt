@@ -2,3 +2,5 @@ django==2.2.*
 postgres==2.2.*
 argon2-cffi==19.1.*
 django-authtools==1.7.*
+djangorestframework==3.10.*
+djangorestframework_simplejwt==4.3.*
