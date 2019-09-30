@@ -33,7 +33,10 @@ const submitFormData = async (url, method, data, form) => {
         'X-CSRFToken': csrftoken
       }
     });
-    return await response.json();
+
+    let text = await response.text();
+
+    return text.length ? JSON.parse(text) : {};
   } catch (error) {
     handleError(form, error);
   }
@@ -85,5 +88,26 @@ const handleTodoItemCompletedChange = event => {
 const completedCheckboxes = document.getElementsByClassName('todo-item-completed');
 
 for (let checkbox of completedCheckboxes) {
-  checkbox.addEventListener('change', handleTodoItemCompletedChange)
+  checkbox.addEventListener('change', handleTodoItemCompletedChange);
+}
+
+const handleTodoItemDeletion = event => {
+  console.log(event);
+  let deleteForm = event.target.closest('form');
+  const data = formToJSON(deleteForm.elements);
+  console.log(data);
+
+  submitFormData(deleteForm.action, 'delete', data, deleteForm).then(response => {
+    if (!response) {
+      return;
+    }
+
+    deleteForm.parentElement.remove();
+  })
+};
+
+const deleteButtons = document.getElementsByClassName('delete-todo-item-button');
+
+for (let button of deleteButtons) {
+  button.addEventListener('click', handleTodoItemDeletion);
 }
