@@ -1,10 +1,15 @@
+const csrftoken = Cookies.get('csrftoken');
+
 const formToJSON = elements => [].reduce.call(elements, (data, element) => {
+  if (element.name === "") {
+    return data;
+  }
   data[element.name] = element.type !== "checkbox" ? element.value : element.checked;
 
   return data;
 }, {});
 
-const handleError = error => {
+const handleError = (form, error) => {
   let errorDiv = document.createElement('div');
   errorDiv.className = "non-field-errors";
 
@@ -18,12 +23,10 @@ const handleError = error => {
   form.parentElement.insertBefore(errorDiv, form);
 };
 
-const addItem = async data => {
-  let csrftoken = Cookies.get('csrftoken');
-
+const submitFormData = async (url, method, data, form) => {
   try {
-    const response = await fetch(form.action, {
-      method: form.method,
+    const response = await fetch(url, {
+      method: method,
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
@@ -32,29 +35,32 @@ const addItem = async data => {
     });
     return await response.json();
   } catch (error) {
-    handleError(error);
+    handleError(form, error);
   }
 };
 
 const handleAddItemFormSubmit = event => {
   event.preventDefault();
 
-  const data = formToJSON(form.elements);
+  const data = formToJSON(addItemForm.elements);
 
-  addItem(data).then(response => {
-    if (response.text) {
+  submitFormData(addItemForm.action, addItemForm.method, data, addItemForm).then(response => {
+    if (!response) {
+      return;
+    }
+    if (response.hasOwnProperty('text')) {
       let newItem = document.createElement('li');
 
       newItem.textContent = response.text;
 
       items.appendChild(newItem);
     } else {
-      handleError(response.detail);
+      handleError(addItemForm, response.detail);
     }
   });
 };
 
 const items = document.getElementById('id-todo-items');
-const form = document.getElementById('id-add-item-form');
+const addItemForm = document.getElementById('id-add-item-form');
 
-form.addEventListener('submit', handleAddItemFormSubmit);
+addItemForm.addEventListener('submit', handleAddItemFormSubmit);
