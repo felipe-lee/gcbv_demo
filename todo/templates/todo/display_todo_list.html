@@ -27,17 +27,56 @@
   <section id="id-list-items">
     <h2>List Items</h2>
 
-    {% if todo_list.todoitemmodel_set.all %}
-      <ul id="id-todo-items">
-        {% for todo_item in todo_list.todoitemmodel_set.all %}
-          <li>{{ todo_item.text }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
+    {% if not todo_list.todoitemmodel_set.all %}
       <p>
         This list has no items.
       </p>
-    {% endif %}
+    {% endif %}  {# todo_list.todoitemmodel_set.all #}
+
+    <ul id="id-todo-items">
+      {% for todo_item in todo_list.todoitemmodel_set.all %}
+        <li>
+          <form action="{% url 'todo:items:todoitemmodel-detail' pk=todo_item.pk %}"
+                method="post" class="form-inline todo-item-edit-form">
+
+            <div class="form-group">
+              <label for="id-todo-item-text-{{ todo_item.pk }}" class="sr-only">Todo text:</label>
+
+              <input type="text" id="id-todo-item-text-{{ todo_item.pk }}" name="text"
+                     class="form-control" placeholder="{{ todo_item.text }}"
+                     value="{{ todo_item.text }}" required>
+            </div>
+
+            <div class="form-group pl-3 pr-2">
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input id="id-todo-item-completed-{{ todo_item.pk }}" type="checkbox"
+                       class="custom-control-input todo-item-completed"
+                       name="completed" {% if todo_item.completed %}checked{% endif %}>
+                <label for="id-todo-item-completed-{{ todo_item.pk }}"
+                       class="custom-control-label">Completed?</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="id-todo-item-pk-{{ todo_item.pk }}" hidden>Todo pk:</label>
+
+              <input type="text" id="id-todo-item-pk-{{ todo_item.pk }}" name="id"
+                     class="form-control" value="{{ todo_item.pk }}" required hidden>
+            </div>
+            <div class="form-group">
+              <label for="id-todo-item-list-{{ todo_item.pk }}" hidden>Todo list:</label>
+
+              <input type="text" id="id-todo-item-list-{{ todo_item.pk }}" name="todo_list"
+                     class="form-control" value="{{ todo_list.pk }}" required hidden>
+            </div>
+
+            <button type="button" class="close" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </form>
+        </li>
+      {% endfor %}  {# todo_list.todoitemmodel_set.all #}
+    </ul>
 
     <form id="id-add-item-form" action="{% url 'todo:items:todoitemmodel-list' %}" method="post" class="form-inline">
       {% csrf_token %}

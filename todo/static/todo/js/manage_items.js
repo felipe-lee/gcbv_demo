@@ -64,3 +64,26 @@ const items = document.getElementById('id-todo-items');
 const addItemForm = document.getElementById('id-add-item-form');
 
 addItemForm.addEventListener('submit', handleAddItemFormSubmit);
+
+const handleTodoItemCompletedChange = event => {
+  let checkbox = event.target;
+  let itemForm = checkbox.closest('form');
+  const data = formToJSON(itemForm.elements);
+
+  submitFormData(itemForm.action, 'put', data, itemForm).then(response => {
+    if (!response) {
+      return;
+    }
+    if (response.hasOwnProperty('text')) {
+      console.log(`Set ${response.text} to ${response.completed ? "complete" : "incomplete"}.`)
+    } else {
+      handleError(itemForm, response.detail);
+    }
+  })
+};
+
+const completedCheckboxes = document.getElementsByClassName('todo-item-completed');
+
+for (let checkbox of completedCheckboxes) {
+  checkbox.addEventListener('change', handleTodoItemCompletedChange)
+}
