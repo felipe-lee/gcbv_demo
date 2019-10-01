@@ -26,91 +26,70 @@
   </section>
   <section id="id-list-items">
     <h2>List Items</h2>
+    <div id="app">
+      <p v-if="errors.length">
+        <b>Please correct the following error(s)</b>
+      <div v-for="error in errors">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          [[ error ]]
 
-    {% if not todo_list.todoitemmodel_set.all %}
-      <p>
-        This list has no items.
-      </p>
-    {% endif %}  {# todo_list.todoitemmodel_set.all #}
-
-    <ul id="id-todo-items">
-      {% for todo_item in todo_list.todoitemmodel_set.all %}
-        <li>
-          <form action="{% url 'todo:items:todoitemmodel-detail' pk=todo_item.pk %}"
-                method="post" class="form-inline todo-item-edit-form">
-
-            <div class="form-group">
-              <label for="id-todo-item-text-{{ todo_item.pk }}" class="sr-only">Todo text:</label>
-
-              <input type="text" id="id-todo-item-text-{{ todo_item.pk }}" name="text"
-                     class="form-control" placeholder="{{ todo_item.text }}"
-                     value="{{ todo_item.text }}" required>
-            </div>
-
-            <div class="form-group pl-3 pr-2">
-              <div class="custom-control custom-checkbox custom-control-inline">
-                <input id="id-todo-item-completed-{{ todo_item.pk }}" type="checkbox"
-                       class="custom-control-input todo-item-completed"
-                       name="completed" {% if todo_item.completed %}checked{% endif %}>
-                <label for="id-todo-item-completed-{{ todo_item.pk }}"
-                       class="custom-control-label">Completed?</label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="id-todo-item-pk-{{ todo_item.pk }}" hidden>Todo pk:</label>
-
-              <input type="text" id="id-todo-item-pk-{{ todo_item.pk }}" name="id"
-                     class="form-control" value="{{ todo_item.pk }}" required hidden>
-            </div>
-            <div class="form-group">
-              <label for="id-todo-item-list-{{ todo_item.pk }}" hidden>Todo list:</label>
-
-              <input type="text" id="id-todo-item-list-{{ todo_item.pk }}" name="todo_list"
-                     class="form-control" value="{{ todo_list.pk }}" required hidden>
-            </div>
-
-            <button type="button" class="close delete-todo-item-button" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </form>
-        </li>
-      {% endfor %}  {# todo_list.todoitemmodel_set.all #}
-    </ul>
-
-    <form id="id-add-item-form" action="{% url 'todo:items:todoitemmodel-list' %}" method="post" class="form-inline">
-      {% csrf_token %}
-
-      {% include 'common/forms/non_field_errors.html' with non_field_errors=form.non_field_errors %}
-
-      <div class="form-group">
-        {% include 'common/forms/basic_field.html' with field=form.todo_list readonly=True hidden=True %}
-      </div>
-
-      <div class="form-group">
-        {% include 'common/forms/basic_field.html' with field=form.text %}
-      </div>
-
-      <div class="form-group pl-3 pr-2">
-        <div class="custom-control custom-checkbox custom-control-inline">
-          <input id="id-{{ form.completed.html_name }}" type="checkbox"
-                 class="custom-control-input {% if form.completed.errors %}is-invalid{% endif %}"
-                 name="{{ form.completed.html_name }}">
-          <label for="id-{{ form.completed.html_name }}"
-                 class="custom-control-label">{{ form.completed.label }}?</label>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
       </div>
+      </p>
+      <p v-if="todoItems===null || todoItems.length===0">This list has no items.</p>
+      <div class="form-row d-flex mb-3" :class="item.pk"
+           v-for="item in todoItems" :key="item.pk">
+        <div class="form-group col-auto">
+          <label :for=`id-todo-item-text-${item.pk}` class="sr-only">Todo text:</label>
 
-      <div>
-        <button type="submit" form="id-add-item-form" name="add_item" class="btn btn-primary mb-1 mr-sm-1">
-          Add New Item
-        </button>
+          <input type="text" :id=`id-todo-item-text-${item.pk}` name="text"
+                 class="form-control" :placeholder=`${item.text}`
+                 v-model="item.text">
+        </div>
+        <div class="form-group pl-3 pr-2 pt-1">
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input :id=`id-todo-item-completed-${item.pk}` type="checkbox"
+                   class="custom-control-input todo-item-completed"
+                   name="completed"
+                   v-model="item.completed"
+                   @change="updateCompletion(item)">
+            <label :for=`id-todo-item-completed-${item.pk}`
+                   class="custom-control-label">Completed?</label>
+          </div>
+        </div>
+        <i class="fa fa-trash pt-2" @click="deleteItem(item)"></i>
       </div>
-    </form>
+      <div class="form-row d-flex mb-3">
+        <div class="form-group col-auto">
+          <label for="id-new-todo-item-text" class="sr-only">Todo text:</label>
+          <input type="text" id="id-new-todo-item-text" name="text"
+                 class="form-control" placeholder="new todo item text"
+                 v-model="newItem.text">
+        </div>
+        <div class="form-group pl-3 pr-2 pt-1">
+          <div class="custom-control custom-checkbox custom-control-inline">
+            <input id='id-new-todo-item-completed' type="checkbox"
+                   class="custom-control-input todo-item-completed"
+                   name="completed"
+                   v-model="newItem.completed">
+            <label for="id-new-todo-item-completed"
+                   class="custom-control-label">Completed?</label>
+          </div>
+        </div>
+        <i class="fa fa-save pt-2" @click="addItem()"></i>
+      </div>
+    </div>
   </section>
 {% endblock content %}
 
 {% block end_of_body_js %}
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <script>
+    const todoListPk = "{{ todo_list.pk }}";
+    const todoItemListApiUrl = "{% url 'todo:items:todoitemmodel-list' %}";
+  </script>
   <script src="{% static 'todo/js/manage_items.js' %}"></script>
 {% endblock end_of_body_js %}

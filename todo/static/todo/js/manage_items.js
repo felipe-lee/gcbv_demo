@@ -1,113 +1,85 @@
 const csrftoken = Cookies.get('csrftoken');
-
-const formToJSON = elements => [].reduce.call(elements, (data, element) => {
-  if (element.name === "") {
-    return data;
-  }
-  data[element.name] = element.type !== "checkbox" ? element.value : element.checked;
-
-  return data;
-}, {});
-
-const handleError = (form, error) => {
-  let errorDiv = document.createElement('div');
-  errorDiv.className = "non-field-errors";
-
-  let errorMessageDiv = document.createElement('div');
-  errorMessageDiv.classList.add('alert', 'alert-danger');
-  errorMessageDiv.setAttribute('role', 'alert');
-  errorMessageDiv.textContent = error;
-
-  errorDiv.append(errorMessageDiv);
-
-  form.parentElement.insertBefore(errorDiv, form);
+let headers = {
+  'Content-Type': 'application/json',
+  'X-CSRFToken': csrftoken
 };
 
-const submitFormData = async (url, method, data, form) => {
-  try {
-    const response = await fetch(url, {
-      method: method,
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken
+var app = new Vue({
+  delimiters: ['[[', ']]'],
+  el: '#app',
+  data: {
+    todoItems: null,
+    newItem: {},
+    errors: []
+  },
+  methods: {
+    addItem: function () {
+      this.errors = [];
+
+      if (!this.newItem.hasOwnProperty('text') || this.newItem.text.length === 0) {
+        this.errors.push('New todo items must have some text.');
       }
-    });
 
-    let text = await response.text();
+      if (this.errors.length) {
+        return;
+      }
 
-    return text.length ? JSON.parse(text) : {};
-  } catch (error) {
-    handleError(form, error);
+      this.newItem.todo_list = todoListPk;
+      if (!this.newItem.hasOwnProperty('completed')) {
+        this.newItem.completed = false;
+      }
+
+      fetch(todoItemListApiUrl, {
+        method: 'post',
+        body: JSON.stringify(this.newItem),
+        headers: headers
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.todoItems.push(data);
+          this.newItem = {};
+        })
+    },
+    updateCompletion: function (item) {
+      let url = `${todoItemListApiUrl}${item.pk}/`;
+
+      fetch(url, {
+        method: 'put',
+        body: JSON.stringify(item),
+        headers: headers
+      })
+        .then(response => response.text())
+        .then(responseText => JSON.parse(responseText))
+        .then(data => {
+          console.log(`Set ${data.text} to ${data.completed ? "complete" : "incomplete"}.`)
+        })
+    },
+    deleteItem: function (item) {
+      let url = `${todoItemListApiUrl}${item.pk}/`;
+
+      fetch(url, {
+        method: 'delete',
+        body: JSON.stringify(item),
+        headers: headers
+      })
+        .then(response => {
+          if (response.status === 204) {
+            let index = this.todoItems.indexOf(item);
+            this.todoItems.splice(index, 1);
+          }
+        })
+    }
+  },
+  mounted: function () {
+    let url = `${todoItemListApiUrl}?todo_list=${todoListPk}`;
+
+    fetch(url, {
+      method: 'get',
+      headers: headers
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.todoItems = data.results;
+      })
   }
-};
-
-const handleAddItemFormSubmit = event => {
-  event.preventDefault();
-
-  const data = formToJSON(addItemForm.elements);
-
-  submitFormData(addItemForm.action, addItemForm.method, data, addItemForm).then(response => {
-    if (!response) {
-      return;
-    }
-    if (response.hasOwnProperty('text')) {
-      let newItem = document.createElement('li');
-
-      newItem.textContent = response.text;
-
-      items.appendChild(newItem);
-    } else {
-      handleError(addItemForm, response.detail);
-    }
-  });
-};
-
-const items = document.getElementById('id-todo-items');
-const addItemForm = document.getElementById('id-add-item-form');
-
-addItemForm.addEventListener('submit', handleAddItemFormSubmit);
-
-const handleTodoItemCompletedChange = event => {
-  let checkbox = event.target;
-  let itemForm = checkbox.closest('form');
-  const data = formToJSON(itemForm.elements);
-
-  submitFormData(itemForm.action, 'put', data, itemForm).then(response => {
-    if (!response) {
-      return;
-    }
-    if (response.hasOwnProperty('text')) {
-      console.log(`Set ${response.text} to ${response.completed ? "complete" : "incomplete"}.`)
-    } else {
-      handleError(itemForm, response.detail);
-    }
-  })
-};
-
-const completedCheckboxes = document.getElementsByClassName('todo-item-completed');
-
-for (let checkbox of completedCheckboxes) {
-  checkbox.addEventListener('change', handleTodoItemCompletedChange);
-}
-
-const handleTodoItemDeletion = event => {
-  console.log(event);
-  let deleteForm = event.target.closest('form');
-  const data = formToJSON(deleteForm.elements);
-  console.log(data);
-
-  submitFormData(deleteForm.action, 'delete', data, deleteForm).then(response => {
-    if (!response) {
-      return;
-    }
-
-    deleteForm.parentElement.remove();
-  })
-};
-
-const deleteButtons = document.getElementsByClassName('delete-todo-item-button');
-
-for (let button of deleteButtons) {
-  button.addEventListener('click', handleTodoItemDeletion);
-}
+});
