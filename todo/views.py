@@ -298,3 +298,17 @@ class TodoItemViewSet(viewsets.ModelViewSet):
     """
     queryset = TodoItemModel.objects.all()
     serializer_class = TodoItemSerializer
+
+    def get_queryset(self) -> QuerySet:
+        """
+        Enable filtering of todo items queryset by todo_list query param.
+        :return: filtered queryset, if todo_list is in query params
+        """
+        queryset = super().get_queryset()
+
+        todo_list = self.request.query_params.get('todo_list', None)
+
+        if todo_list is not None:
+            queryset = queryset.filter(todo_list=todo_list)
+
+        return queryset
