@@ -17,4 +17,4 @@ class TodoItemSerializer(serializers.ModelSerializer):
         Define model and fields
         """
         model = TodoItemModel
-        fields = ['todo_list', 'text', 'completed']
+        fields = ['pk', 'todo_list', 'text', 'completed']
