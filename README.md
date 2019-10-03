@@ -96,3 +96,8 @@ else:
 this repo was more about showing how generic CBVs can be used and comparing them to FBVs. Which, yes, would probably be
 very easy to drive home if I set up tests that run on both and work for both, but I just didn't have enough time. Maybe
 I'll come back and write them at some point. (We all know that's not happening...)
+
+## DRF and Vue
+There's a bit of functionality set up using DRF and Vue. Neither are really fully set up the best way, I just 
+implemented them in a very simple way to get that bit of functionality working, but they are also not the point of this
+repo, and should not really be used as reference.
