@@ -91,6 +91,11 @@ else:
     ]
 ```
 
+An example of running with FBVs would be:
+```bash
+DJANGO_VIEW_TYPES=FBV docker-compose up
+```
+
 ## Testing
 ...I...well I didn't write tests for this code... Terrible, I know. Like I pointed out in the beginning of this README,
 this repo was more about showing how generic CBVs can be used and comparing them to FBVs. Which, yes, would probably be
