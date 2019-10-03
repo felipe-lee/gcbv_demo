@@ -24,8 +24,8 @@
   </table>
 {% else %}
   <p>
-    {% if view.kwargs.name_search %}
-      No todo lists were found with input name: {{ view.kwargs.name_search }}.
+    {% if view.request.GET.name %}
+      No todo lists were found with input name: {{ view.request.GET.name }}
     {% else %}
       No todo lists were found.
     {% endif %}

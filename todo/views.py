@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 from rest_framework import viewsets
@@ -37,15 +37,13 @@ class SearchListsView(GetFormView):
     template_name = 'todo/search_lists.html'
     http_method_names = ['get', 'options']
 
-    def form_valid(self, form) -> HttpResponse:
+    def get_success_url(self) -> str:
         """
-        Redirect to view that lists todo lists, filtered by name search.
-        :param form: validated form
-        :return: redirect to another view
+        Build out the url we want to redirect to. We'll combine a redirect to list_todo_lists along with the submitted
+        query string.
+        :return: url that will lead to a view that filters search lists
         """
-        name = form.cleaned_data.get('name')
-
-        return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
+        return f"{reverse('todo:list_todo_lists')}?{self.request.META.get('QUERY_STRING')}"
 
 
 def search_lists_view(request: HttpRequest) -> Union[HttpResponse, HttpResponseRedirect]:
@@ -64,9 +62,9 @@ def search_lists_view(request: HttpRequest) -> Union[HttpResponse, HttpResponseR
     form = SearchListsForm(**form_kwargs)
 
     if request.GET and form.is_valid():
-        name = form.cleaned_data.get('name')
+        url = f"{reverse('todo:list_todo_lists')}?{request.META.get('QUERY_STRING')}"
 
-        return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
+        return redirect(url)
 
     context = {
         'form': form
@@ -89,26 +87,24 @@ class ListTodoListsView(ListView):
         """
         queryset = super().get_queryset()
 
-        if 'name_search' in self.kwargs:
-            queryset = queryset.filter(name__icontains=self.kwargs['name_search'])
+        if 'name' in self.request.GET:
+            queryset = queryset.filter(name__icontains=self.request.GET['name'])
 
         return queryset
 
 
-def list_todo_lists_view(request: HttpRequest, name_search='') -> HttpResponse:
+def list_todo_lists_view(request: HttpRequest) -> HttpResponse:
     """
     View to list TodoLists
     :param request: wsgi request
-    :param name_search: string to filter queryset by
     :return: template with todo lists
     """
     queryset = TodoListModel.objects.all()
-    if name_search:
-        queryset = queryset.filter(name__icontains=name_search)
+    if 'name' in request.GET:
+        queryset = queryset.filter(name__icontains=request.GET['name'])
 
     context = {
-        'object_list': queryset,
-        'name_search': name_search,
+        'object_list': queryset
     }
     return render(request, 'todo/list_todo_lists.html', context)
 
