@@ -11,10 +11,14 @@ Optional vars:
     "placeholder" Placeholder for input. The default is the field label.
     "label_classes" class(es) for label
     "input_classes" Class(es) for input
+    "disabled" add disabled attribute to input
+    "readonly" add readonly attribute to input
+    "hidden" add hidden attribute to input/label
 {% endcomment %}
 
 <label for="{{ field.id_for_label }}"
-       class="{% if not show_label %}sr-only{% endif %} {{ label_classes }}">{{ field.label }}</label>
+       class="{% if not show_label %}sr-only{% endif %} {{ label_classes }}" {% if hidden %}hidden{% endif %}>
+  {{ field.label }}</label>
 
 <input type="{% if type %}{{ type }}{% else %}text{% endif %}" id="{{ field.id_for_label }}"
        name="{{ field.html_name }}"
@@ -22,7 +26,8 @@ Optional vars:
        placeholder="{% if placeholder %}{{ placeholder }}{% else %}{{ field.label }}{% endif %}"
        value="{{ field.value|default_if_none:"" }}" {% if field.field.required %}required{% endif %}
        {% if disabled %}disabled=""{% endif %}
-       {% if readonly %}readonly=""{% endif %}>
+       {% if readonly %}readonly=""{% endif %}
+       {% if hidden %}hidden{% endif %}>
 
 {% include 'common/forms/field_errors.html' %}
 

@@ -45,6 +45,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'authtools',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 PROJECT_APPS = [
@@ -63,6 +65,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 20,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework.authentication.TokenAuthentication',
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
+}
 
 ROOT_URLCONF = 'gcbv_demo.urls'
 

@@ -3,19 +3,21 @@
 Views for todo app
 """
 from copy import deepcopy
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from django.contrib import messages
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from rest_framework import viewsets
 
 from common.views import FormListView, GetFormView
-from todo.forms import SearchListsForm, TodoListForm
-from todo.models import TodoListModel
+from todo.forms import SearchListsForm, TodoItemForm, TodoListForm
+from todo.models import TodoItemModel, TodoListModel
+from todo.serializers import TodoItemSerializer
 
 
 def home_view(request: HttpRequest) -> HttpResponse:
@@ -35,15 +37,13 @@ class SearchListsView(GetFormView):
     template_name = 'todo/search_lists.html'
     http_method_names = ['get', 'options']
 
-    def form_valid(self, form) -> HttpResponse:
+    def get_success_url(self) -> str:
         """
-        Redirect to view that lists todo lists, filtered by name search.
-        :param form: validated form
-        :return: redirect to another view
+        Build out the url we want to redirect to. We'll combine a redirect to list_todo_lists along with the submitted
+        query string.
+        :return: url that will lead to a view that filters search lists
         """
-        name = form.cleaned_data.get('name')
-
-        return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
+        return f"{reverse('todo:list_todo_lists')}?{self.request.META.get('QUERY_STRING')}"
 
 
 def search_lists_view(request: HttpRequest) -> Union[HttpResponse, HttpResponseRedirect]:
@@ -62,9 +62,9 @@ def search_lists_view(request: HttpRequest) -> Union[HttpResponse, HttpResponseR
     form = SearchListsForm(**form_kwargs)
 
     if request.GET and form.is_valid():
-        name = form.cleaned_data.get('name')
+        url = f"{reverse('todo:list_todo_lists')}?{request.META.get('QUERY_STRING')}"
 
-        return redirect(reverse_lazy('todo:list_filtered_todo_lists', kwargs={'name_search': name}))
+        return redirect(url)
 
     context = {
         'form': form
@@ -87,26 +87,24 @@ class ListTodoListsView(ListView):
         """
         queryset = super().get_queryset()
 
-        if 'name_search' in self.kwargs:
-            queryset = queryset.filter(name__icontains=self.kwargs['name_search'])
+        if 'name' in self.request.GET:
+            queryset = queryset.filter(name__icontains=self.request.GET['name'])
 
         return queryset
 
 
-def list_todo_lists_view(request: HttpRequest, name_search='') -> HttpResponse:
+def list_todo_lists_view(request: HttpRequest) -> HttpResponse:
     """
     View to list TodoLists
     :param request: wsgi request
-    :param name_search: string to filter queryset by
     :return: template with todo lists
     """
     queryset = TodoListModel.objects.all()
-    if name_search:
-        queryset = queryset.filter(name__icontains=name_search)
+    if 'name' in request.GET:
+        queryset = queryset.filter(name__icontains=request.GET['name'])
 
     context = {
-        'object_list': queryset,
-        'name_search': name_search,
+        'object_list': queryset
     }
     return render(request, 'todo/list_todo_lists.html', context)
 
@@ -176,6 +174,20 @@ class DisplayTodoListView(DetailView):
     template_name = 'todo/display_todo_list.html'
     model = TodoListModel
     context_object_name = 'todo_list'
+
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        """
+        Add new item form to context
+        :param kwargs: kwargs for template context
+        :return: kwargs for template context with form added
+        """
+        initial = {
+            'todo_list': self.kwargs.get('pk')
+        }
+
+        kwargs['form'] = TodoItemForm(initial=initial)
+
+        return super().get_context_data(**kwargs)
 
 
 def display_todo_list_view(request: HttpRequest, pk: int) -> HttpResponse:
@@ -274,3 +286,25 @@ def delete_todo_list_view(request: HttpRequest, pk: int) -> HttpResponseRedirect
         messages.success(request=request, message=success_message)
 
         return redirect(reverse_lazy('todo:list_and_filter_todo_lists'))
+
+
+class TodoItemViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows todo items to be viewed or edited
+    """
+    queryset = TodoItemModel.objects.all()
+    serializer_class = TodoItemSerializer
+
+    def get_queryset(self) -> QuerySet:
+        """
+        Enable filtering of todo items queryset by todo_list query param.
+        :return: filtered queryset, if todo_list is in query params
+        """
+        queryset = super().get_queryset()
+
+        todo_list = self.request.query_params.get('todo_list', None)
+
+        if todo_list is not None:
+            queryset = queryset.filter(todo_list=todo_list)
+
+        return queryset
